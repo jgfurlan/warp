@@ -504,6 +504,7 @@ pub enum CLIAgentType {
     Goose,
     Hermes,
     Vibe,
+    Agy,
     Unknown,
 }
 

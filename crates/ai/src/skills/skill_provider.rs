@@ -39,6 +39,7 @@ pub enum SkillProvider {
     Droid,
     Github,
     OpenCode,
+    Agy,
 }
 
 /// Represents the scope of a skill (home directory vs project directory).
@@ -80,6 +81,7 @@ impl SkillProvider {
             SkillProvider::Claude => Icon::ClaudeLogo,
             SkillProvider::Codex => Icon::OpenAILogo,
             SkillProvider::Gemini => Icon::GeminiLogo,
+            SkillProvider::Agy => Icon::AgyLogo,
             SkillProvider::Droid => Icon::DroidLogo,
             SkillProvider::OpenCode => Icon::OpenCodeLogo,
             SkillProvider::Warp
@@ -127,6 +129,10 @@ pub static SKILL_PROVIDER_DEFINITIONS: LazyLock<Vec<SkillProviderDefinition>> =
             SkillProviderDefinition {
                 provider: SkillProvider::Gemini,
                 skills_path: PathBuf::from(".gemini").join("skills"),
+            },
+            SkillProviderDefinition {
+                provider: SkillProvider::Agy,
+                skills_path: PathBuf::from(".antigravitycli").join("skills"),
             },
             SkillProviderDefinition {
                 provider: SkillProvider::Copilot,
@@ -233,6 +239,18 @@ mod tests {
         let path = warp_home_skills_dir.join("my-skill").join("SKILL.md");
 
         assert_eq!(get_provider_for_path(&path), Some(SkillProvider::Warp));
+        assert_eq!(get_scope_for_path(&path), SkillScope::Home);
+    }
+
+    #[test]
+    fn agy_home_skill_path_is_home_agy_skill() {
+        let Some(home_dir) = dirs::home_dir() else {
+            eprintln!("Skipping test: home directory not available");
+            return;
+        };
+        let path = home_dir.join(".antigravitycli").join("skills").join("my-skill").join("SKILL.md");
+
+        assert_eq!(get_provider_for_path(&path), Some(SkillProvider::Agy));
         assert_eq!(get_scope_for_path(&path), SkillScope::Home);
     }
 }

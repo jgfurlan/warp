@@ -1,0 +1,15 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="agy-rainbow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="25%" stop-color="#7C3AED" />
+      <stop offset="50%" stop-color="#EC4899" />
+      <stop offset="75%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+  </defs>
+  <!-- Beautiful upward chevron shape -->
+  <path d="M12 3L2 20H7L12 9.5L17 20H22L12 3Z" fill="url(#agy-rainbow)" />
+  <!-- Rounded horizontal crossbar to form the 'A' shape -->
+  <rect x="7" y="13.5" width="10" height="2.5" rx="1.25" fill="url(#agy-rainbow)" />
+</svg>

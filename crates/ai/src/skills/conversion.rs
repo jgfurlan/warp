@@ -73,6 +73,7 @@ impl From<SkillProvider> for api::skill_descriptor::Provider {
             SkillProvider::Codex => api::skill_descriptor::provider::Type::Codex(()),
             SkillProvider::Cursor => api::skill_descriptor::provider::Type::Cursor(()),
             SkillProvider::Gemini => api::skill_descriptor::provider::Type::Gemini(()),
+            SkillProvider::Agy => api::skill_descriptor::provider::Type::Gemini(()),
             SkillProvider::Copilot => api::skill_descriptor::provider::Type::Copilot(()),
             SkillProvider::Droid => api::skill_descriptor::provider::Type::Droid(()),
             SkillProvider::Github => api::skill_descriptor::provider::Type::Github(()),

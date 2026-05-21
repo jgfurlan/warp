@@ -47,6 +47,7 @@ pub fn is_agent_supported(agent: &CLIAgent) -> bool {
             | CLIAgent::Gemini
             | CLIAgent::Auggie
             | CLIAgent::Pi
+            | CLIAgent::Agy
     )
 }
 
@@ -62,7 +63,8 @@ fn create_handler(agent: &CLIAgent) -> Option<Box<dyn CLIAgentSessionHandler>> {
         | CLIAgent::OpenCode
         | CLIAgent::Gemini
         | CLIAgent::Auggie
-        | CLIAgent::Pi => Some(Box::new(DefaultSessionListener)),
+        | CLIAgent::Pi
+        | CLIAgent::Agy => Some(Box::new(DefaultSessionListener)),
         CLIAgent::Codex => Some(Box::new(CodexSessionHandler)),
         CLIAgent::Hermes
         | CLIAgent::Amp
@@ -324,6 +326,46 @@ mod tests {
         let event = CLIAgentEvent {
             v: 1,
             agent: CLIAgent::Pi,
+            event: CLIAgentEventType::Stop,
+            session_id: None,
+            cwd: None,
+            project: None,
+            payload: CLIAgentEventPayload::default(),
+        };
+        assert!(handler.handle_event(event).is_some());
+    }
+
+    #[test]
+    fn agy_is_supported() {
+        assert!(is_agent_supported(&CLIAgent::Agy));
+    }
+
+    #[test]
+    fn agy_uses_default_handler_with_rich_status() {
+        assert!(agent_supports_rich_status(&CLIAgent::Agy));
+    }
+
+    #[test]
+    fn agy_default_handler_skips_session_start() {
+        let mut handler = DefaultSessionListener;
+        let event = CLIAgentEvent {
+            v: 1,
+            agent: CLIAgent::Agy,
+            event: CLIAgentEventType::SessionStart,
+            session_id: None,
+            cwd: None,
+            project: None,
+            payload: CLIAgentEventPayload::default(),
+        };
+        assert!(handler.handle_event(event).is_none());
+    }
+
+    #[test]
+    fn agy_default_handler_forwards_stop() {
+        let mut handler = DefaultSessionListener;
+        let event = CLIAgentEvent {
+            v: 1,
+            agent: CLIAgent::Agy,
             event: CLIAgentEventType::Stop,
             session_id: None,
             cwd: None,

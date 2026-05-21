@@ -30,7 +30,15 @@ fn returns_manager_for_gemini() {
 }
 
 #[test]
+fn returns_manager_for_agy() {
+    let _agy_guard = crate::features::FeatureFlag::AgyNotifications.override_enabled(true);
+    let _hoa_guard = crate::features::FeatureFlag::HOANotifications.override_enabled(true);
+    assert!(plugin_manager_for(CLIAgent::Agy).is_some());
+}
+
+#[test]
 fn returns_none_for_unsupported_agents() {
+    assert!(plugin_manager_for(CLIAgent::Agy).is_none());
     assert!(plugin_manager_for(CLIAgent::Amp).is_none());
     assert!(plugin_manager_for(CLIAgent::Droid).is_none());
     assert!(plugin_manager_for(CLIAgent::Copilot).is_none());

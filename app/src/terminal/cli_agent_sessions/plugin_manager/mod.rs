@@ -2,6 +2,7 @@ pub(crate) mod claude;
 pub(crate) mod codex;
 pub(crate) mod gemini;
 pub(crate) mod opencode;
+pub(crate) mod agy;
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -19,6 +20,7 @@ use claude::ClaudeCodePluginManager;
 use codex::CodexPluginManager;
 use gemini::GeminiPluginManager;
 use opencode::OpenCodePluginManager;
+use agy::AgyPluginManager;
 
 /// Distinguishes whether the plugin instructions modal should show install or update steps.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -254,9 +256,20 @@ pub(crate) fn plugin_manager_for_with_shell(
                 path_env_var,
             )))
         }
+        CLIAgent::Agy
+            if FeatureFlag::AgyNotifications.is_enabled()
+                && FeatureFlag::HOANotifications.is_enabled() =>
+        {
+            Some(Box::new(AgyPluginManager::new(
+                shell_path,
+                shell_type,
+                path_env_var,
+            )))
+        }
         CLIAgent::OpenCode
         | CLIAgent::Codex
         | CLIAgent::Gemini
+        | CLIAgent::Agy
         | CLIAgent::Amp
         | CLIAgent::Droid
         | CLIAgent::Copilot
