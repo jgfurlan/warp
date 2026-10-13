@@ -25,7 +25,7 @@ While Warp currently recognizes `agy` and displays the Antigravity toolbar and b
 ## 5. Testable Invariants
 
 1. **Session Listener Registration:** Panes running `CLIAgent::Antigravity` are recognized as supported by `is_agent_supported()`, and `create_handler()` yields a valid session handler (`DefaultSessionListener`).
-2. **Notification Processing:** Emitting a structured OSC 777 `PluggableNotification` within an `agy` session parses valid agent event payloads (e.g. `task_complete`) and skips raw `session_start` duplicates.
+2. **Notification Processing:** Emitting a structured OSC 777 `PluggableNotification` within an `agy` session parses valid agent event payloads—supporting both canonical event names (`session_start`, `stop`, `agent_needs_input`) and Antigravity event aliases (`task_started`, `task_complete`, `prompt_required`)—and skips raw `session_start` duplicates.
 3. **Delayed-Enter PTY Submission:** Submitting rich input text while an Antigravity CLI session is active routes through `RichInputSubmitStrategy::DelayedEnter`, inserting the prompt buffer before dispatching a carriage return.
 
 ## 6. Success Criteria
@@ -36,5 +36,6 @@ While Warp currently recognizes `agy` and displays the Antigravity toolbar and b
 ## 7. Validation
 
 - **Unit tests:** Assert `is_agent_supported(&CLIAgent::Antigravity)` is true and `create_handler(&CLIAgent::Antigravity)` returns `Some`.
+- **Unit tests:** Assert both canonical event names and Antigravity aliases (`task_started`, `task_complete`, `prompt_required`) parse and dispatch through `DefaultSessionListener`.
 - **Unit tests:** Assert `rich_input_submit_strategy(CLIAgent::Antigravity)` returns `RichInputSubmitStrategy::DelayedEnter`.
 - **Manual verification:** Run `agy` in a local terminal and verify multiline prompt entry and OSC 777 notification handling.

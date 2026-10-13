@@ -81,13 +81,23 @@ fn rich_input_submit_strategy(agent: CLIAgent) -> RichInputSubmitStrategy {
 }
 ```
 
+### 2c. Event Parsing & Agent Resolution (`app/src/terminal/cli_agent_sessions/event/v1.rs` and `app/src/terminal/cli_agent.rs`)
+
+1. In `app/src/terminal/cli_agent_sessions/event/v1.rs`, map the Antigravity notification event names to canonical `CLIAgentEventType` variants:
+   - `"session_start" | "task_started" => CLIAgentEventType::SessionStart,`
+   - `"stop" | "task_complete" => CLIAgentEventType::Stop,`
+   - `"agent_needs_input" | "prompt_required" => CLIAgentEventType::NeedsInput,`
+2. In `app/src/terminal/cli_agent.rs`, include `"antigravity"` in `CLIAgent::Antigravity.command_prefixes()` alongside `"agy"` to resolve both agent identifiers.
+
 ## 3. Data Flow & Notification Handling
 
 1. An `agy` process running in the terminal emits an OSC 777 escape sequence formatted as:
-   `\x1b]777;notify;{"event":"task_complete","body":"Task finished"}\x1b\`
+   `\x1b]777;notify;{"v":1,"agent":"agy","event":"task_complete"}\x1b\`
+   (or canonical `"event":"stop"`).
 2. The terminal PTY parser extracts the `PluggableNotification` and invokes `CLIAgentSessionHandler::try_parse`.
-3. `DefaultSessionListener` filters out initial `SessionStart` duplicates and forwards valid agent event payloads (`task_started`, `task_complete`, `prompt_required`) to `CLIAgentSessionsModel`.
-4. `CLIAgentSessionsModel` publishes UI updates, adjusting the tab indicator and active status.
+3. The v1 event parser resolves `agent: "agy"` or `"antigravity"` to `CLIAgent::Antigravity`, and translates `task_complete` / `stop` to `CLIAgentEventType::Stop` (and `task_started` / `session_start` to `SessionStart`, `prompt_required` / `agent_needs_input` to `NeedsInput`).
+4. `DefaultSessionListener` filters out initial `SessionStart` duplicates and forwards valid agent event payloads to `CLIAgentSessionsModel`.
+5. `CLIAgentSessionsModel` publishes UI updates, adjusting the tab indicator and active status.
 
 ## 4. Testing and Validation
 
@@ -95,6 +105,6 @@ fn rich_input_submit_strategy(agent: CLIAgent) -> RichInputSubmitStrategy {
    - In `app/src/terminal/cli_agent_sessions/listener/mod_tests.rs`, assert `is_agent_supported(&CLIAgent::Antigravity)` returns true.
    - Assert `create_handler(&CLIAgent::Antigravity)` returns `Some`.
 2. **Invariant 2 Verification:**
-   - Send mock OSC 777 payloads to a session with `CLIAgent::Antigravity` and verify `task_complete` is dispatched.
+   - In `app/src/terminal/cli_agent_sessions/listener/mod_tests.rs`, verify that both canonical events (`session_start`, `stop`) and Antigravity aliases (`task_started`, `task_complete`, `prompt_required`), as well as `"agy"` and `"antigravity"` agent identifiers, parse and handle correctly.
 3. **Invariant 3 Verification:**
    - In `app/src/terminal/view/use_agent_footer/` tests, assert `rich_input_submit_strategy(CLIAgent::Antigravity)` equals `RichInputSubmitStrategy::DelayedEnter`.
